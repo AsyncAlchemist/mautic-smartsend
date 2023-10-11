@@ -57,36 +57,36 @@ main() {
 
     # Start the loop
     while [[ $FILE_COUNT -gt 0 ]]; do
-    # Capture the start time of the cycle
-    START_TIME=$(date +%s)
+        # Capture the start time of the cycle
+        START_TIME=$(date +%s)
 
-    # Calculate messages being sent in this cycle and remaining messages
-    MESSAGES_THIS_CYCLE=$(( FILE_COUNT < MESSAGE_LIMIT ? FILE_COUNT : MESSAGE_LIMIT ))
-    REMAINING_MESSAGES=$(( FILE_COUNT - MESSAGES_THIS_CYCLE ))
+        # Calculate messages being sent in this cycle and remaining messages
+        MESSAGES_THIS_CYCLE=$(( FILE_COUNT < MESSAGE_LIMIT ? FILE_COUNT : MESSAGE_LIMIT ))
+        REMAINING_MESSAGES=$(( FILE_COUNT - MESSAGES_THIS_CYCLE ))
 
-    # Execute the PHP command with the message limit
-    $PHP_EXEC $BIN_DIR/console mautic:emails:send --message-limit $MESSAGE_LIMIT
+        # Execute the PHP command with the message limit
+        $PHP_EXEC $BIN_DIR/console mautic:emails:send --message-limit $MESSAGE_LIMIT
 
-    # Increment the messages sent counter
-    TOTAL_MESSAGES_SENT=$(( TOTAL_MESSAGES_SENT + MESSAGES_THIS_CYCLE ))
+        # Increment the messages sent counter
+        TOTAL_MESSAGES_SENT=$(( TOTAL_MESSAGES_SENT + MESSAGES_THIS_CYCLE ))
 
-    # Wait for the specified sleep time
-    sleep $SLEEP_TIME
+        # Wait for the specified sleep time
+        sleep $SLEEP_TIME
 
-    # Capture the end time of the cycle
-    END_TIME=$(date +%s)
-    CYCLE_DURATION=$(( END_TIME - START_TIME ))
+        # Capture the end time of the cycle
+        END_TIME=$(date +%s)
+        CYCLE_DURATION=$(( END_TIME - START_TIME ))
 
-    # Calculate the projected finish time after each cycle
-    ESTIMATED_FINISH_TIME=$(( END_TIME + (REMAINING_MESSAGES / MESSAGE_LIMIT) * CYCLE_DURATION ))
-    ESTIMATED_FINISH_HUMAN=$(date -d "@$ESTIMATED_FINISH_TIME" "+%Y-%m-%d %H:%M:%S")
+        # Calculate the projected finish time after each cycle
+        ESTIMATED_FINISH_TIME=$(( END_TIME + (REMAINING_MESSAGES / MESSAGE_LIMIT) * CYCLE_DURATION ))
+        ESTIMATED_FINISH_HUMAN=$(date -d "@$ESTIMATED_FINISH_TIME" "+%Y-%m-%d %H:%M:%S")
 
-    # Count the number of messages in the spool directory
-    FILE_COUNT=$(count_files)
+        # Count the number of messages in the spool directory
+        FILE_COUNT=$(count_files)
 
-    # Print the output and use tput to move the cursor up 6 lines (to start of the output block)
-    print_output
-    ctput cuu 6
+        # Print the output and use tput to move the cursor up 6 lines (to start of the output block)
+        print_output
+        ctput cuu 6
     done
 
     # Clear any old output and display the final message
