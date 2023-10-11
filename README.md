@@ -51,12 +51,7 @@ Replace Mautic's default `mautic:emails:send` cron job with `MauticSmartSend`. B
    nano mautic_smartsend.sh
    ```
 
-5. Give the script execution permissions:
-   ```bash
-   chmod +x mautic_smartsend.sh
-   ```
-
-6. Move it to your desired directory.
+5. Move it to your desired directory.
 
 ## Configuration
 
