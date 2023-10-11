@@ -46,9 +46,9 @@ main() {
 
     # Set initial placeholder values for the display variables
     FILE_COUNT=$(count_files)
-    MESSAGES_THIS_CYCLE="Initializing..."
-    REMAINING_MESSAGES="Initializing..."
-    ESTIMATED_FINISH_HUMAN="Initializing..."
+    MESSAGES_THIS_CYCLE=""
+    REMAINING_MESSAGES=""
+    ESTIMATED_FINISH_HUMAN=""
     TOTAL_MESSAGES_SENT=0
 
     # Print the initial "box" using the print_output function
