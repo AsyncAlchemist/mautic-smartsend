@@ -28,15 +28,35 @@ Replace Mautic's default `mautic:emails:send` cron job with `MauticSmartSend`. B
 
 ## Installation
 
-1. Clone the repository or download the script directly.
+1. **Download the Script**:  
+   Use `wget` to download the script directly from the GitHub repository.
+   ```bash
+   wget https://raw.githubusercontent.com/mrlazycoder/mautic-smartsend/main/mautic_smartsend.sh
+   ```
+
 2. Ensure you have the necessary dependencies installed:
     - PHP (version 7.4 or above is recommended)
     - Mautic (tested with version 4.4.1)
-3. Give the script execution permissions:
+
+3. **Make the Script Executable**:  
+   Once the script is downloaded, you'll need to make it executable.
    ```bash
    chmod +x mautic_smartsend.sh
    ```
-4. Move it to your desired directory.
+
+4. **Configuration**:  
+   Before you can run the script, you'll need to open it in your favorite text editor and configure some settings at the top of the script. See details below in the [Configuration](#configuration) section.
+
+   ```bash
+   nano mautic_smartsend.sh
+   ```
+
+5. Give the script execution permissions:
+   ```bash
+   chmod +x mautic_smartsend.sh
+   ```
+
+6. Move it to your desired directory.
 
 ## Configuration
 
