@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.0.1] - 2023-10-10
+
+### Fixed
+- Fixed a bug with the console output.
+- Script now exits if Mautic produces any console output.
+
 ## [1.0.0] - 2023-10-10
 
 ### Added

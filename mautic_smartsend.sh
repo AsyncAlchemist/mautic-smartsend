@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # ==============================================================
-# MauticSmartSend 1.0
+# MauticSmartSend 1.0.1
 # ==============================================================
 # Purpose: An intelligent script to send Mautic emails in a 
 #          controlled manner, providing real-time feedback and
@@ -46,9 +46,9 @@ main() {
 
     # Set initial placeholder values for the display variables
     FILE_COUNT=$(count_files)
-    MESSAGES_THIS_CYCLE=""
-    REMAINING_MESSAGES=""
-    ESTIMATED_FINISH_HUMAN=""
+    MESSAGES_THIS_CYCLE="$MESSAGE_LIMIT"
+    REMAINING_MESSAGES="$FILE_COUNT"
+    ESTIMATED_FINISH_HUMAN="Calc..."
     TOTAL_MESSAGES_SENT=0
 
     # Print the initial "box" using the print_output function
@@ -60,12 +60,21 @@ main() {
         # Capture the start time of the cycle
         START_TIME=$(date +%s)
 
-        # Calculate messages being sent in this cycle and remaining messages
+        # Calculate messages being sent in this cycle
         MESSAGES_THIS_CYCLE=$(( FILE_COUNT < MESSAGE_LIMIT ? FILE_COUNT : MESSAGE_LIMIT ))
-        REMAINING_MESSAGES=$(( FILE_COUNT - MESSAGES_THIS_CYCLE ))
 
         # Execute the PHP command with the message limit
         $PHP_EXEC $BIN_DIR/console mautic:emails:send --message-limit $MESSAGE_LIMIT
+
+        # Capture the output of the Mautic command
+        MAUTIC_OUTPUT=$($PHP_EXEC $BIN_DIR/console mautic:emails:send --message-limit $MESSAGE_LIMIT 2>&1)
+
+        # Check if there's any output
+        if [[ ! -z "$MAUTIC_OUTPUT" ]]; then
+            echo "Error: Mautic command produced an unexpected output:"
+            echo "$MAUTIC_OUTPUT"
+            exit 1
+        fi
 
         # Increment the messages sent counter
         TOTAL_MESSAGES_SENT=$(( TOTAL_MESSAGES_SENT + MESSAGES_THIS_CYCLE ))
@@ -83,6 +92,8 @@ main() {
 
         # Count the number of messages in the spool directory
         FILE_COUNT=$(count_files)
+
+        REMAINING_MESSAGES=$(( FILE_COUNT - MESSAGES_THIS_CYCLE ))
 
         # Print the output and use tput to move the cursor up 6 lines (to start of the output block)
         print_output
@@ -158,12 +169,12 @@ print_help() {
 
 # Function to display the output block
 print_output() {
-    cprint "====================================="
-    cprint "Messages waiting to be sent: $FILE_COUNT"
-    cprint "Sending in this cycle: $MESSAGES_THIS_CYCLE"
-    cprint "Remaining after this cycle: $REMAINING_MESSAGES"
-    cprint "Projected finish time: $ESTIMATED_FINISH_HUMAN"
-    cprint "====================================="
+    cprint "=========================================="
+    cprint "Messages waiting to be sent: $FILE_COUNT                           "
+    cprint "Sending in this cycle: $MESSAGES_THIS_CYCLE                        "
+    cprint "Remaining after this cycle: $REMAINING_MESSAGES                    "
+    cprint "Projected finish time: $ESTIMATED_FINISH_HUMAN                     "
+    cprint "=========================================="
 }
 
 pre_run_checks() {
