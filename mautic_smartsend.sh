@@ -63,16 +63,17 @@ main() {
         # Calculate messages being sent in this cycle
         MESSAGES_THIS_CYCLE=$(( FILE_COUNT < MESSAGE_LIMIT ? FILE_COUNT : MESSAGE_LIMIT ))
 
-        # Execute the PHP command with the message limit
-        $PHP_EXEC $BIN_DIR/console mautic:emails:send --message-limit $MESSAGE_LIMIT
-
-        # Capture the output of the Mautic command
+        # Execute the Mautic command and capture its output
         MAUTIC_OUTPUT=$($PHP_EXEC $BIN_DIR/console mautic:emails:send --message-limit $MESSAGE_LIMIT 2>&1)
+        MAUTIC_EXIT_STATUS=$?
 
-        # Check if there's any output
-        if [[ ! -z "$MAUTIC_OUTPUT" ]]; then
-            echo "Error: Mautic command produced an unexpected output:"
-            echo "$MAUTIC_OUTPUT"
+        # Check the exit status of PHP/Mautic
+        if [ $MAUTIC_EXIT_STATUS -ne 0 ] || [[ ! -z "$MAUTIC_OUTPUT" ]]; then
+            echo "Error: Mautic command failed."
+            if [[ ! -z "$MAUTIC_OUTPUT" ]]; then
+                echo "Mautic provided the following error message:"
+                echo "$MAUTIC_OUTPUT"
+            fi
             exit 1
         fi
 
@@ -131,6 +132,11 @@ process_args() {
 # Check the number of messages in the spool
 count_files() {
     find "$SPOOL_DIR" -maxdepth 1 -type f | wc -l
+    if [ $? -ne 0 ]; then
+    echo "Error: Unable to execute 'find' command due to process limits."
+    exit 1
+fi
+
 }
 
 # Conditional print function
@@ -181,8 +187,15 @@ pre_run_checks() {
     # Check for the existence of the lock file and retrieve PID
     if [ -e "$LOCK_FILE" ]; then
         LOCKED_PID=$(cat $LOCK_FILE)
-        echo "The script is already running with PID $LOCKED_PID. Exiting."
-        exit 1
+        
+        # Check if this PID is actually still running
+        if kill -0 $LOCKED_PID 2>/dev/null; then
+            echo "The script is already running with PID $LOCKED_PID. Exiting."
+            exit 1
+        else
+            echo "Found stale lock file for PID $LOCKED_PID. Removing and starting a new instance."
+            rm -f "$LOCK_FILE"
+        fi
     fi
 
     # Check if we can write to the lock file directory
